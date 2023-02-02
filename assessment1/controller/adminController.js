@@ -1,10 +1,13 @@
 const jwt = require('jsonwebtoken');
 const User = require('../schema/userSchema');
 
+//importing function to generate token for the admin
+const { tokenGenerate } = require('../validate/token');
+
 const createAdmin = async (req, res) => {
         try {
     const { name, email, password, phone, address, role } = req.body;
-        const admin = new User({
+    const admin = new User({
             name,
             email,
             password,
@@ -13,9 +16,9 @@ const createAdmin = async (req, res) => {
             role,
         })
         const result = await admin.save();
-        res.status(201).send(result)
-    } catch (error) {
-        res.status(203).send({ error: error });
+        res.status(201).send(result);
+    } catch (err) {
+        res.status(404).send({err});
     }
 };
 
@@ -30,52 +33,47 @@ const loginAdmin = async (req, res) => {
             return res.send("password is incorrect");
         }
         if(user.role === 'admin') {
-            const token = await user.tokenGenerate()
-            // console.log(user,token);
+            const token = await tokenGenerate(user.email);
             res.status(200).send(token);    
         } else {
             return res.send("user is not admin");
         }
-    } catch (error) {
-        res.status(404).send({ error: error });
+    } catch (err) {
+        res.status(404).send({err});
     }
 };
 
 const viewAdmin = async (req, res) => {
-    const userData = await User.findOne({ email: req.body.email });
+    const data = await User.findOne({ email: req.body.email });
     if (data) {
-        console.log("Now,You can access the user through the given id");
-        res.status(202).send(userData);
+        res.status(200).send(data);
     } else {
-        res.status(204).send(error);
+        res.status(404).send(error);
     }
 };
 
 const allUsers = async (req,res) => {
     try{
         const result = await User.find()
-        console.log("all the users will be shown there");
         res.status(200).send(result);    
-    } catch (error) {
-          res.status(200).send({error: error});
+    } catch (err) {
+          res.status(404).send({err});
        }
     };
 
 const updateAdmin = async (req, res) => {
   try {
-    const updatedData = await User.findOneAndUpdate({ email: req.body.email },{ $set: { name: req.body.name , address: req.body.address }});  
-    console.log("The given information has been updated");
-    res.status(205).send(updatedData);
+    const updatedData = await User.findOneAndUpdate({ email: req.body.email },{ $set: { name: req.body.name , address: req.body.address }});
+    res.status(205).send(updatedData);  //status code:205 for modified data
   }
-      catch (error) {
-       res.status(304).send({ error: error})
+      catch (err) {
+       res.status(404).send({err});
       }
 };
 
 const deleteAdmin = async (req, res) => {
     const deletedData = await User.findOneAndDelete({ _id: req.body.id });
     if (deletedData) {
-        console.log("User has been deleted");
         res.status(200).send(deletedData);
     }
     else {
@@ -86,26 +84,22 @@ const deleteAdmin = async (req, res) => {
 const adminActive = async (req, res) => {
         try {
         User.findOneAndUpdate({ email: req.body.email }, { $set: { active : true } }).then((value) => {
-            console.log("User has been activated");
             res.send("User has been activated");
         })
     }
-    catch (error) {
-        console.log(error);
-        res.send({error: error});
+    catch (err) {
+        res.send({err});
     }
 };
 
  const adminDeactivate = async (req, res) => {
         try {
         User.findOneAndUpdate({ email: req.body.email }, {$set: { active : false } }).then((value) => {
-            console.log("User has been deactivated");
             res.send("User has been deactivated");
         })
     }
-    catch (error) {
-        console.log(error);
-        res.send({error: error});
+        catch (err) {
+         res.send({err});
     }
 };
 

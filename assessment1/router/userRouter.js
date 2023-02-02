@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
 const { createUser, loginUser, viewUser, updateUser, deleteUser } = require('../controller/userController');
 const { createAdmin, loginAdmin, viewAdmin, allUsers, updateAdmin, deleteAdmin, adminActive, adminDeactivate } = require('../controller/adminController');
 const { userAuth, adminAuth} = require('../validate/auth');
@@ -14,7 +13,7 @@ router.delete('/delete',userAuth,deleteUser);
 
 router.post('/createadmin',createAdmin);
 router.post('/loginadmin',loginAdmin);
-router.get('/readUserData',adminAuth,viewAdmin);
+router.get('/viewadmin',adminAuth,viewAdmin);
 router.get('/allUsersData',adminAuth,allUsers);
 router.patch('/updateUserData',adminAuth,updateAdmin);
 router.delete('/deleteUserData',adminAuth,deleteAdmin);

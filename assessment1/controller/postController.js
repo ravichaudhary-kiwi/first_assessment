@@ -8,7 +8,6 @@ const createPost = async (req, res) => {
         description,
     })
      const result = await userPost.save();
-      console.log("User has been created");
            res.status(201).send(result);
     } catch (error) {
          res.status(203).send({ error:error });

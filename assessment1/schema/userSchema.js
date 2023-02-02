@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
-
+const bcrypt = require('bcrypt');
 const schemaObject = {
    
     name: {
@@ -23,7 +23,6 @@ const schemaObject = {
     password: {
         type : String,
         minLength : 8,
-        maxLength : 12,
         required : true
 },
 
@@ -62,24 +61,5 @@ const schemaObject = {
 };
 
 const schema = new mongoose.Schema(schemaObject);
-
-schema.methods.jsontokenGenerate = async function() {
-    const user = this;
-    const token = jwt.sign({email : user.email}, 'studentKey');
-    console.log(token);
-    user.tokens = user.tokens.concat({token});
-    await user.save();
-    return token;
-};
-
-schema.methods.tokenGenerate = async function() {
-    const user = this;
-    const token = jwt.sign({email : user.email}, 'adminKey');
-    console.log(token);
-    user.tokens = user.tokens.concat({token});
-    await user.save();
-    return token;
-};
-
-const model = mongoose.model('User',schema);
+const model = mongoose.model('User',schemaObject);
 module.exports = model;
